@@ -5,4 +5,259 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Projeto Sala ABA — Avaliação da Equipe</title>
 <style>
-  :root{--azul:#2F5496;--amarelo:#FFF2CC;formulário-estilo:herdado;}
+  :root{--azul:#2F5496;--amarelo:#FFF2CC;--verde:#2E7D32;--cinza:#f4f5f7;--borda:#d8d8d8;}
+  *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;}
+  body{background:var(--cinza);padding:14px;max-width:680px;margin:0 auto;}
+  .card{background:#fff;border-radius:12px;padding:18px 14px;box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:12px;}
+  h1{font-size:1.1rem;color:var(--azul);}
+  .sub{font-size:.8rem;color:#555;margin-top:4px;}
+  .bloco{border:1px solid var(--borda);border-radius:10px;margin-top:14px;overflow:hidden;}
+  .bloco-h{background:var(--azul);color:#fff;padding:8px 12px;font-size:.9rem;font-weight:bold;}
+  .bloco-h small{font-weight:normal;opacity:.85;}
+  .q{padding:10px 12px;border-bottom:1px solid #eee;}
+  .q:last-child{border-bottom:none;}
+  .nome{font-size:.85rem;font-weight:bold;}
+  .desc{font-size:.72rem;color:#666;margin:2px 0 6px;}
+  .escala{display:flex;gap:5px;}
+  .escala label{flex:1;cursor:pointer;}
+  .escala input{display:none;}
+  .escala span{display:block;text-align:center;padding:7px 0;border:1px solid #bbb;border-radius:7px;background:#fff;font-size:.8rem;}
+  .escala input:checked+span{background:var(--azul);color:#fff;border-color:var(--azul);}
+  label.lbl{display:block;font-size:.85rem;font-weight:bold;margin:14px 0 6px;}
+  input[type=text],textarea{width:100%;padding:10px;border:1px solid #bbb;border-radius:8px;font-size:1rem;background:var(--amarelo);}
+  textarea{resize:vertical;}
+  .obs{margin:8px 12px 12px;}
+  .obs label{font-size:.75rem;font-weight:bold;color:#444;}
+  .obs textarea{font-size:.85rem;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px;}
+  .chips label{cursor:pointer;}
+  .chips input{display:none;}
+  .chips span{display:inline-block;padding:7px 11px;border:1px solid #bbb;border-radius:16px;background:#fff;font-size:.78rem;}
+  .chips input:checked+span{background:var(--amarelo);border-color:var(--azul);font-weight:bold;}
+  .opc{margin:8px 12px 12px;}
+  .opc label{font-size:.75rem;font-weight:bold;color:#444;}
+  .opc input[type=text]{font-size:.85rem;}
+  button{width:100%;margin-top:16px;padding:14px;background:var(--azul);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:bold;cursor:pointer;}
+  button:disabled{background:#9bb0d4;}
+  .erro{color:#c00;font-size:.8rem;margin-top:10px;display:none;}
+  #ok{text-align:center;padding:24px 10px;display:none;}
+  #ok .tick{font-size:3rem;color:var(--verde);}
+  #ok h2{color:var(--verde);font-size:1.1rem;margin:8px 0;}
+  #ok p{font-size:.85rem;color:#555;}
+  footer{font-size:.7rem;color:#999;text-align:center;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="card" id="form-card">
+  <h1>Projeto Sala ABA — Avaliação da Equipe</h1>
+  <p class="sub">Tríade Espaço Terapêutico · Projeto-teste de implementação da <b>2ª sala ABA</b> com segmentação clínica.<br>
+  Resposta <b>anônima</b>. Sua opinião orienta os ajustes do modelo — seja sincero(a).</p>
+
+  <form id="f" novalidate>
+    <label class="lbl">Nome (opcional — deixe em branco para ficar 100% anônimo)
+      <input type="text" id="nome" placeholder="Seu nome ou iniciais" autocomplete="off">
+    </label>
+
+    <label class="lbl">Em qual sala você atua?
+      <select id="sala" style="width:100%;padding:10px;border:1px solid #bbb;border-radius:8px;font-size:1rem;background:var(--amarelo);">
+        <option value="">— selecione —</option>
+        <option>Sala 1 — Aquisição de Repertórios Básicos</option>
+        <option>Sala 2 — Habilidades Sociais e Generalização</option>
+        <option>Integração semanal (sextas) / ambas</option>
+        <option>Apoio administrativo / supervisão</option>
+      </select>
+    </label>
+
+    <div class="bloco">
+      <div class="bloco-h">1 · Antes × Agora <small>(comparação dos processos)</small></div>
+      <div class="q">
+        <div class="nome">1a. Como você avalia a organização do atendimento AGORA (2 salas segmentadas), comparada com ANTES (sala única)?</div>
+        <div class="desc">1 = Muito pior · 2 = Pior · 3 = Igual · 4 = Melhor · 5 = Muito melhor</div>
+        <div class="escala" data-c="antes_agora"></div>
+      </div>
+      <div class="obs"><label>Em que você percebeu a diferença? (opcional)</label>
+        <textarea id="antes_agora" rows="2" placeholder="Ex.: menos comportamento simultâneo entre os pacientes, mais foco na sessão..."></textarea></div>
+    </div>
+
+    <div class="bloco">
+      <div class="bloco-h">2 · Melhorias <small>(o que melhorou)</small></div>
+      <div class="q">
+        <div class="nome">2a. Quais melhorias você percebeu no seu trabalho e nos atendimentos?</div>
+        <div class="desc">Marque todas que se aplicam</div>
+        <div class="chips" id="melhorias_chips"></div>
+        <div class="opc"><label>Outra melhoria (descreva)</label>
+          <input type="text" id="melhorias_outro" placeholder="Escreva aqui..."></div>
+      </div>
+    </div>
+
+    <div class="bloco">
+      <div class="bloco-h">3 · Dificuldades <small>(o que está difícil)</small></div>
+      <div class="q">
+        <div class="nome">3a. Quais dificuldades você encontrou com o novo modelo?</div>
+        <div class="desc">Marque todas que se aplicam</div>
+        <div class="chips" id="dif_chips"></div>
+        <div class="obs"><label>Detalhe a principal dificuldade (opcional)</label>
+          <textarea id="dificuldades" rows="2" placeholder="Conte como isso acontece na prática..."></textarea></div>
+      </div>
+    </div>
+
+    <div class="bloco">
+      <div class="bloco-h">4 · O que ainda falta <small>(para melhorar)</small></div>
+      <div class="q">
+        <div class="nome">4a. O que ainda falta para o modelo funcionar melhor?</div>
+        <div class="desc">Marque todas que se aplicam</div>
+        <div class="chips" id="falta_chips"></div>
+        <div class="obs"><label>Detalhe o que falta (opcional)</label>
+          <textarea id="falta_melhorar" rows="2" placeholder="O que você pediria como prioridade?"></textarea></div>
+      </div>
+    </div>
+
+    <div class="bloco">
+      <div class="bloco-h">5 · Integração <small>(treinamentos, acompanhamento)</small></div>
+      <div class="q">
+        <div class="nome">5a. Como você avalia o processo de integração ao novo modelo (treinamentos, orientações, acompanhamento)?</div>
+        <div class="desc">1 = Muito insuficiente · 2 = Insuficiente · 3 = Razoável · 4 = Bom · 5 = Excelente</div>
+        <div class="escala" data-c="integracao"></div>
+      </div>
+      <div class="q">
+        <div class="nome">5b. Você recebeu apoio suficiente da supervisão/gestão durante a transição?</div>
+        <div class="escala" data-c="apoio"></div>
+      </div>
+      <div class="q">
+        <div class="nome">5c. Os treinamentos foram suficientes para você atuar na sua sala?</div>
+        <div class="escala" data-c="treinamentos"></div>
+      </div>
+      <div class="obs"><label>Comentários sobre a integração (opcional)</label>
+        <textarea id="integracao_txt" rows="2" placeholder="Ex.: faltou treinamento prático sobre X; supervisão presente; material claro..."></textarea></div>
+    </div>
+
+    <label class="lbl">Sugestões para o projeto <span style="font-weight:normal;font-size:.75rem;color:#777;">(opcional)</span>
+      <textarea id="sugestoes" rows="3" placeholder="Ideias, ajustes, críticas — tudo bem..."></textarea>
+    </label>
+
+    <p class="erro" id="erro">⚠ Preencha a sala onde você atua e as escalas 1a, 5a, 5b e 5c.</p>
+    <button type="submit" id="btn">Enviar avaliação</button>
+  </form>
+</div>
+
+<div class="card" id="ok">
+  <div class="tick">✔</div>
+  <h2>Avaliação enviada!</h2>
+  <p>Obrigado. Sua resposta é anônima e será usada para melhorar o projeto da 2ª sala ABA.</p>
+</div>
+
+<footer>Tríade Espaço Terapêutico · Projeto-teste 2ª Sala ABA — segmentação clínica · Avaliação da equipe</footer>
+
+<script>
+var MELHORIAS = [
+  'Mais atenção individual ao paciente',
+  'Menos comportamento disruptivo na sessão',
+  'Ambiente mais calmo / menos estímulo',
+  'Atividades mais adequadas ao nível dos pacientes',
+  'Melhor organização dos materiais',
+  'Mais clareza no meu papel',
+  'Melhor comunicação com a equipe',
+  'Pacientes mais engajados'
+];
+var DIFS = [
+  'Falta de material/equipamento',
+  'Espaço físico inadequado',
+  'Falta de pessoal / escala apertada',
+  'Dúvida sobre critérios de alocação dos pacientes',
+  'Dificuldade na transição de pacientes entre salas',
+  'Comunicação entre as duas salas',
+  'Rotina/papeleo mais demorado',
+  'Treinamento insuficiente'
+];
+var FALTA = [
+  'Mais treinamento prático',
+  'Protocolo/critério escrito de transição entre salas',
+  'Mais materiais adaptados',
+  'Adequação do espaço físico',
+  'Reunião de alinhamento entre as salas',
+  'Feedback individual da supervisão',
+  'Ajuste de escala / quadro de pessoal',
+  'Nada — está funcionando bem'
+];
+
+function chips(id, lista){
+  var div = document.getElementById(id), html='';
+  lista.forEach(function(t){
+    html += '<label><input type="checkbox" name="'+id+'" value="'+t+'"><span>'+t+'</span></label>';
+  });
+  div.innerHTML = html;
+}
+chips('melhorias_chips', MELHORIAS);
+chips('dif_chips', DIFS);
+chips('falta_chips', FALTA);
+
+document.querySelectorAll('.escala').forEach(function(div){
+  var c = div.getAttribute('data-c'), html='';
+  for(var v=5;v>=1;v--){
+    html += '<label><input type="radio" name="'+c+'" value="'+v+'"><span>'+v+'</span></label>';
+  }
+  div.innerHTML = html;
+});
+
+var WEBHOOK = 'https://maestro.adapta.one/webhooks/generic/6a1efe68d0f56155c6961d86a70a5a3a2bfbee8739db0b335d0e76dd70f5aace?secret=1a29f1bba722d4e034d167533aeed7e2fb392d000ff46760fe0d6fb942b2038e';
+
+function marcados(id){
+  var out = [];
+  document.querySelectorAll('input[name="'+id+'"]:checked').forEach(function(el){ out.push(el.value); });
+  return out;
+}
+
+document.getElementById('f').addEventListener('submit', function(e){
+  e.preventDefault();
+  var sala = document.getElementById('sala').value;
+  var escalas = ['antes_agora','integracao','apoio','treinamentos'];
+  var notas = {};
+  escalas.forEach(function(c){
+    var el = document.querySelector('input[name="'+c+'"]:checked');
+    notas[c] = el ? Number(el.value) : null;
+  });
+  var completo = sala && notas.antes_agora!==null && notas.integracao!==null && notas.apoio!==null && notas.treinamentos!==null;
+  if(!completo){ document.getElementById('erro').style.display='block'; return; }
+  document.getElementById('erro').style.display='none';
+  var btn = document.getElementById('btn');
+  btn.disabled = true; btn.textContent = 'Enviando...';
+
+  var payload = {
+    enviado_em: new Date().toISOString(),
+    nome: document.getElementById('nome').value.trim(),
+    sala: sala,
+    antes_agora: notas.antes_agora,
+    antes_agora_txt: document.getElementById('antes_agora').value.trim(),
+    melhorias: marcados('melhorias_chips').join(', '),
+    melhorias_outro: document.getElementById('melhorias_outro').value.trim(),
+    dificuldades: document.getElementById('dificuldades').value.trim(),
+    dif_areas: marcados('dif_chips').join(', '),
+    falta_melhorar: document.getElementById('falta_melhorar').value.trim(),
+    falta_areas: marcados('falta_chips').join(', '),
+    integracao: notas.integracao,
+    apoio: notas.apoio,
+    treinamentos: notas.treinamentos,
+    integracao_txt: document.getElementById('integracao_txt').value.trim(),
+    sugestoes: document.getElementById('sugestoes').value.trim()
+  };
+
+  // mode 'no-cors': o webhook não envia cabeçalhos CORS, então o navegador
+  // bloquearia a leitura da resposta ("Failed to fetch"). No-cors despacha o
+  // POST (simples, text/plain) sem preflight; falha de rede ainda rejeita.
+  fetch(WEBHOOK, {
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify(payload)
+  }).then(function(){
+    document.getElementById('form-card').style.display='none';
+    document.getElementById('ok').style.display='block';
+  }).catch(function(err){
+    btn.disabled=false; btn.textContent='Enviar avaliação';
+    document.getElementById('erro').textContent='⚠ Falha no envio ('+err.message+'). Verifique a internet e tente de novo.';
+    document.getElementById('erro').style.display='block';
+  });
+});
+</script>
+</body>
+</html>
